@@ -11,15 +11,16 @@ ENV NPM_CONFIG_LOGLEVEL warn
 # Install the latest version by default.
 ARG VERSION=latest
 
+# Update npm version
+RUN npm i npm@latest -g
+
 # Need to install extra dependencies for native modules.
 RUN deluser --remove-home node && \
     addgroup -g 1000 composer && \
     adduser -u 1000 -G composer -s /bin/sh -D composer && \
     apk add --no-cache make gcc g++ python git libc6-compat && \
-    su -c "npm install npm@latest -g" - composer && \
     su -c "npm config set prefix '/home/composer/.npm-global'" - composer && \
     su -c "npm install --production -g pm2 base64-js ieee754 composer-rest-server@${VERSION} loopback-connector-mongodb passport-google-oauth2" - composer && \
-    su -c "npm audit fix" - composer && \
     su -c "npm cache clean --force" - composer && \
     rm -rf /home/composer/.config /home/composer/.node-gyp /home/composer/.npm && \
 apk del make gcc g++ python git
